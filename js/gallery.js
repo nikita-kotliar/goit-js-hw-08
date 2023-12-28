@@ -66,45 +66,59 @@ const images = [
     },
 ];
 
-function CreatePhotoGallery(image) {
-    const GalleryItem = document.createElement("li");
-    GalleryItem.classList.add("gallery-item");
+function createPhotoGallery(image) {
+  const galleryItem = document.createElement("li");
+  galleryItem.classList.add("gallery-item");
 
-    const GalleryLink = document.createElement("a");
-    GalleryLink.href = image.original;
-    GalleryLink.classList.add("gallery-link");
+  const galleryLink = document.createElement("a");
+  galleryLink.href = image.original;
+  galleryLink.classList.add("gallery-link");
 
-    const GalleryImage = document.createElement("img");
-    GalleryImage.src = image.preview;
-    GalleryImage.setAttribute("data-source", image.original);
-    GalleryImage.alt = image.description;
-    GalleryImage.classList.add('gallery-image');
+  const galleryImage = document.createElement("img");
+  galleryImage.src = image.preview;
+  galleryImage.setAttribute("data-source", image.original);
+  galleryImage.alt = image.description;
+  galleryImage.classList.add('gallery-image');
 
-    GalleryLink.appendChild(GalleryImage);
-    GalleryItem.appendChild(GalleryLink);
+  galleryLink.appendChild(galleryImage);
+  galleryItem.appendChild(galleryLink);
 
-    return GalleryItem;
+  return galleryItem;
 }
 
 function openModal(imageSource) {
-    const instance = basicLightbox.create(`<img src="${imageSource}">`);
-    instance.show();
-}
-  
-galleryContainer.addEventListener('click', (event) => {
-    event.preventDefault();
-
-    if (event.target.nodeName !== 'IMG') {
-        return;
+  const instance = basicLightbox.create(`<img src="${imageSource}">`, {
+    onShow: (instance) => {
+        window.addEventListener("keydown", onEscKeyClose);
+    },
+    onClose: (instance) => {
+        window.removeEventListener("keydown", onEscKeyClose);
     }
+  });
 
-    const imageSource = event.target.dataset.source;
-    openModal(imageSource);
-});
-  
-function renderGallery() {
-    const GalleryItems = images.map(CreatePhotoGallery);
-    galleryContainer.append(...GalleryItems);
+  function onEscKeyClose(event) {
+    if (event.key === 'Escape') {
+      instance.close();
+    }
+  }
+
+  instance.show();
 }
-  
+
+galleryContainer.addEventListener('click', (event) => {
+  event.preventDefault();
+
+  if (event.target.nodeName !== 'IMG') {
+    return;
+  }
+
+  const imageSource = event.target.dataset.source;
+  openModal(imageSource);
+});
+
+function renderGallery() {
+  const galleryItems = images.map(createPhotoGallery);
+  galleryContainer.append(...galleryItems);
+}
+
 renderGallery();
