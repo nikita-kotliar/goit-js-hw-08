@@ -86,22 +86,30 @@ function createPhotoGallery(image) {
   return galleryItem;
 }
 
+let currentLightboxInstance = null;
+
 function openModal(imageSource) {
+  if (currentLightboxInstance) {
+    currentLightboxInstance.close();
+  }
+
   const instance = basicLightbox.create(`<img src="${imageSource}">`, {
     onShow: (instance) => {
-        window.addEventListener("keydown", onEscKeyClose);
+      window.addEventListener("keydown", onEscKeyClose);
     },
     onClose: (instance) => {
-        window.removeEventListener("keydown", onEscKeyClose);
-    }
+      window.removeEventListener("keydown", onEscKeyClose);
+      currentLightboxInstance = null;
+    },
   });
 
   function onEscKeyClose(event) {
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       instance.close();
     }
   }
 
+  currentLightboxInstance = instance;
   instance.show();
 }
 
